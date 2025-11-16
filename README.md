@@ -2,8 +2,6 @@
 
 ---
 
-b
-
 Multiplatform library for codegen of typed navigation in Navigation 3.
 
 Library is designed to keep the same level of control that Navigation 3 gives to developer.
@@ -16,6 +14,18 @@ It introduces several concepts:
 Actually, this lib can be used without KSP if you really like writing boilerplate by hand.
 
 Somewhat inspired by awesome android library [compose-destinations](https://github.com/raamcosta/compose-destinations)
+
+---
+
+## Showcase
+
+Android
+
+![android](.github/assets/android.mp4)
+
+iOS
+
+![ios](.github/assets/ios.mp4)
 
 ---
 
@@ -64,3 +74,10 @@ That's it!
 
 For more examples you can see 'example' module with multiplatform app that shows few usages of this library.
 
+1) [Simple navigation](example/composeApp/src/commonMain/kotlin/io/github/fopwoc/nav3ksp/example/01-simple.kt) - Just plain navigation
+2) [Back Handled](example/composeApp/src/commonMain/kotlin/io/github/fopwoc/nav3ksp/example/02-backhandled.kt) - Like simple navigation, but back gesture is handled in view
+3) [ViewModel](example/composeApp/src/commonMain/kotlin/io/github/fopwoc/nav3ksp/example/03-viewmodel.kt) - Example how this lib handles view models
+4) [Arguments](example/composeApp/src/commonMain/kotlin/io/github/fopwoc/nav3ksp/example/04-arguments.kt) - Navigation with typed arguments 
+5) [Nested](example/composeApp/src/commonMain/kotlin/io/github/fopwoc/nav3ksp/example/05-nested.kt) - Nested navigation with bottom bar and 3 views. Also example of handing backstack from another scope.
+6) [Result](example/composeApp/src/commonMain/kotlin/io/github/fopwoc/nav3ksp/example/06-result.kt) - Navigation to form with result handling by another View
+7) [Manual](example/composeApp/src/commonMain/kotlin/io/github/fopwoc/nav3ksp/example/06-result.kt) - Boilerplate by hand
