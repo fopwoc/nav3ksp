@@ -1,7 +1,9 @@
 name: Publish
+
 on:
-  release:
-    types: [released, prereleased]
+  push:
+    tags:
+      - '*.*.*'
 
 permissions:
   contents: read

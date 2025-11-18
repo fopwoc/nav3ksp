@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-modules:
+  build:
     name: Build ${{ matrix.module }}
     runs-on: macOS-latest
     strategy:
