@@ -6,6 +6,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: publish-${{ github.event.release.tag_name || github.ref || github.sha }}
+  cancel-in-progress: false
+
 jobs:
   publish:
     name: Release build and publish
