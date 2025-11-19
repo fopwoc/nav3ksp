@@ -51,7 +51,7 @@ kotlin {
             api(libs.navigation3)
             api(libs.serialization)
 
-            api(projects.ksp.annotation)
+            api(projects.ksp.nav3kspAnnotation)
         }
     }
 }

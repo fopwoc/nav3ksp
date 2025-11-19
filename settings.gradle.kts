@@ -34,3 +34,6 @@ include(
     ":ksp:processor",
     ":example:composeApp"
 )
+
+project(":ksp:annotation").name = "nav3ksp-annotation"
+project(":ksp:processor").name = "nav3ksp-processor"

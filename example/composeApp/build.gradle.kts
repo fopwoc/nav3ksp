@@ -51,7 +51,7 @@ kotlin {
 }
 
 dependencies {
-    add("kspCommonMainMetadata", projects.ksp.processor)
+    add("kspCommonMainMetadata", projects.ksp.nav3kspAnnotation)
 }
 
 ksp {
