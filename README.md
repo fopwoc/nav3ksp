@@ -1,5 +1,7 @@
 # Nav3ksp
 
+[![Build](https://github.com/fopwoc/nav3ksp/actions/workflows/build.yml/badge.svg)](https://github.com/fopwoc/nav3ksp/actions/workflows/build.yml)
+
 Multiplatform codegen library for typed navigation in Navigation 3.
 
 Library is designed to keep the same level of control that Navigation 3 gives to developer.
