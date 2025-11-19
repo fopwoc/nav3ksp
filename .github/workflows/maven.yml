@@ -1,15 +1,12 @@
-name: Publish
+name: Maven Publish
 
 on:
   release:
     types: [released, prereleased]
 
-permissions:
-  contents: read
-
 jobs:
-  publish:
-    name: Release build and publish
+  maven:
+    name: Publish release
     runs-on: macOS-latest
     strategy:
       fail-fast: false
