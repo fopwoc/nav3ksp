@@ -9,8 +9,8 @@ plugins {
 }
 
 allprojects {
-    group = "io.github.fopwoc.nav3ksp"
+    group = "io.github.fopwoc"
     version = providers.exec {
-        commandLine("git", "describe", "--tags", "--abbrev=0",  "--always")
+        commandLine("git", "describe", "--tags", "--abbrev=0", "--always")
     }.standardOutput.asText.get().trim()
 }

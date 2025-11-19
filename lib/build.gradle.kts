@@ -21,7 +21,7 @@ kotlin {
     jvmToolchain(libs.versions.java.get().toInt())
 
     androidLibrary {
-        namespace = group.toString()
+        namespace = "$group.nav3ksp"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
