@@ -1,3 +1,4 @@
+import com.google.devtools.ksp.gradle.KspAATask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -51,7 +52,7 @@ kotlin {
 }
 
 dependencies {
-    add("kspCommonMainMetadata", projects.ksp.nav3kspAnnotation)
+    add("kspCommonMainMetadata", projects.ksp.nav3kspProcessor)
 }
 
 ksp {
@@ -89,6 +90,8 @@ android {
     }
 }
 
-//tasks.named("preBuild") {
-//    dependsOn("kspCommonMainKotlinMetadata")
-//}
+tasks.withType<KspAATask>().configureEach {
+    if (name != "kspCommonMainKotlinMetadata") {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }
+}
