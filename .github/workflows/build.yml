@@ -36,10 +36,23 @@ jobs:
       - name: Assemble
         run: gradle ${{ matrix.module }}:assemble --no-daemon
 
-  build-example-apk:
-    name: Build example app (APK)
+  build-example:
+    name: Build example (${{ matrix.target }})
     needs: build-lib
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: apk
+            gradle_task: ":example:composeApp:assembleRelease"
+          - target: jar
+            gradle_task: ":example:composeApp:jvmJar"
+          - target: js
+            gradle_task: ":example:composeApp:jsBrowserProductionWebpack || gradle :example:composeApp:jsBrowserDistribution"
+          - target: wasm
+            gradle_task: ":example:composeApp:wasmJsBrowserProductionWebpack || gradle :example:composeApp:wasmJsBrowserDistribution"
+
     steps:
       - name: Check out code
         uses: actions/checkout@v5
@@ -48,119 +61,53 @@ jobs:
         uses: ./.github/actions/build-env
 
       - name: Setup Android SDK
+        if: matrix.target == 'apk'
         uses: android-actions/setup-android@v3
 
       - name: Assemble
-        run: gradle :example:composeApp:assembleRelease --no-daemon
+        run: gradle ${{ matrix.gradle_task }} --no-daemon
 
       - name: Collect Artifacts
+        env:
+          APP_BUILD_PATH: "example/composeApp/build"
         run: |
-          mkdir -p artifacts/android
-          cp -r example/composeApp/build/outputs/apk/release/*.apk artifacts/android/
+          mkdir -p "artifacts/${{ matrix.target }}"
+          case "${{ matrix.target }}" in
+            apk)
+              cp -r $APP_BUILD_PATH/outputs/apk/release/*.apk "artifacts/${{ matrix.target }}/"
+              ;;
+            jar)
+              cp -r $APP_BUILD_PATH/libs/*.jar "artifacts/${{ matrix.target }}/"
+              ;;
+            js)
+              if [ -d $APP_BUILD_PATH/distributions ]; then
+                cp -r $APP_BUILD_PATH/distributions/* "artifacts/${{ matrix.target }}/"
+              fi
+              if [ -d $APP_BUILD_PATH/dist/js/productionExecutable ]; then
+                cp -r $APP_BUILD_PATH/dist/js/productionExecutable/* "artifacts/${{ matrix.target }}/"
+              fi
+              ;;
+            wasm)
+              if [ -d $APP_BUILD_PATH/distributions ]; then
+                cp -r $APP_BUILD_PATH/distributions/* "artifacts/${{ matrix.target }}/"
+              fi
+              if [ -d $APP_BUILD_PATH/dist/wasmJs/productionExecutable ]; then
+                cp -r $APP_BUILD_PATH/dist/wasmJs/productionExecutable/* "artifacts/${{ matrix.target }}/"
+              fi
+              ;;
+          esac
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: android-build
-          path: artifacts/android
-          retention-days: 14
-
-  build-example-jar:
-    name: Build example app (JAR)
-    needs: build-lib
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v5
-
-      - name: Setup build env
-        uses: ./.github/actions/build-env
-
-      - name: Assemble
-        run: gradle :example:composeApp:jvmJar --no-daemon
-
-      - name: Collect Artifacts
-        run: |
-          mkdir -p artifacts/jvm
-          cp -r example/composeApp/build/libs/*.apk artifacts/android/
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: jvm-build
-          path: artifacts/jvm
-          retention-days: 14
-
-  build-example-js:
-    name: Build example app (JS Browser)
-    needs: build-lib
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v5
-
-      - name: Setup build env
-        uses: ./.github/actions/build-env
-
-      - name: Assemble
-        run: |
-          gradle :example:composeApp:jsBrowserProductionWebpack --no-daemon || \
-          gradle :example:composeApp:jsBrowserDistribution --no-daemon
-
-      - name: Collect JS Artifacts
-        run: |
-          mkdir -p artifacts/js
-            if [ -d example/composeApp/build/distributions ]; then
-              cp -r example/composeApp/build/distributions/* artifacts/js/
-            fi
-            if [ -d example/composeApp/build/dist/js/productionExecutable ]; then
-              cp -r example/composeApp/build/dist/js/productionExecutable/* artifacts/js/
-            fi
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-js-build
-          path: artifacts/js
-          retention-days: 14
-
-  build-example-wasm:
-    name: Build example app (WASM)
-    needs: build-lib
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v5
-
-      - name: Setup build env
-        uses: ./.github/actions/build-env
-
-      - name: Assemble
-        run: |
-          gradle :example:composeApp:wasmJsBrowserProductionWebpack --no-daemon || \
-          gradle :example:composeApp:wasmJsBrowserDistribution --no-daemon
-
-      - name: Collect Artifacts
-        run: |
-          mkdir -p artifacts/wasm
-          if [ -d example/composeApp/build/distributions ]; then
-            cp -r example/composeApp/build/distributions/* artifacts/wasm/
-          fi
-          if [ -d example/composeApp/build/dist/wasmJs/productionExecutable ]; then
-            cp -r example/composeApp/build/dist/wasmJs/productionExecutable/* artifacts/wasm/
-          fi
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-wasm-build
-          path: artifacts/wasm
+          name: ${{ matrix.target }}-build
+          path: artifacts/${{ matrix.target }}
           retention-days: 14
 
   summary:
     name: Build Summary
     runs-on: ubuntu-latest
-    needs: [build-lib, build-example-apk, build-example-jar, build-example-js, build-example-wasm]
+    needs: [build-lib, build-example]
     steps:
       - name: Summary
         run: echo "Build jobs completed successfully."
