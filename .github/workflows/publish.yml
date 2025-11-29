@@ -28,8 +28,10 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS_B64 }}
-        run: gradle publishToMavenCentral --no-configuration-cache --no-daemon
+          $ORG_GRADLE_PROJECT_signingInMemoryKey_B64: ${{ secrets.GPG_KEY_CONTENTS_B64 }}
+        run: |
+          export ORG_GRADLE_PROJECT_signingInMemoryKey="$(echo "$ORG_GRADLE_PROJECT_signingInMemoryKey_B64" | base64 -d)"
+          gradle publishToMavenCentral --no-configuration-cache --no-daemon
 
       - name: Determine prerelease
         id: release_meta
