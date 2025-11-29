@@ -33,7 +33,7 @@ jobs:
       - name: Setup build env
         uses: ./.github/actions/build-env
 
-      - name: Build
+      - name: Assemble
         run: gradle ${{ matrix.module }}:assemble --no-daemon
 
   build-example-apk:
@@ -50,15 +50,15 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Assemble APK
-        run: gradle :example:assembleRelease --no-daemon
+      - name: Assemble
+        run: gradle :example:composeApp:assembleRelease --no-daemon
 
-      - name: Collect Android Artifacts
+      - name: Collect Artifacts
         run: |
           mkdir -p artifacts/android
           cp -r example/composeApp/build/outputs/apk/release/*.apk artifacts/android/
 
-      - name: Upload Android Artifacts
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: android-build
@@ -76,25 +76,91 @@ jobs:
       - name: Setup build env
         uses: ./.github/actions/build-env
 
-      - name: Assemble APK
-        run: gradle :example:jvmJar --no-daemon
+      - name: Assemble
+        run: gradle :example:composeApp:jvmJar --no-daemon
 
-      - name: Collect Android Artifacts
+      - name: Collect Artifacts
         run: |
           mkdir -p artifacts/jvm
           cp -r example/composeApp/build/libs/*.apk artifacts/android/
 
-      - name: Upload Android Artifacts
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: jvm-build
           path: artifacts/jvm
           retention-days: 14
 
+  build-example-js:
+    name: Build example app (JS Browser)
+    needs: build-lib
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      - name: Setup build env
+        uses: ./.github/actions/build-env
+
+      - name: Assemble
+        run: |
+          gradle :example:composeApp:jsBrowserProductionWebpack --no-daemon || \
+          gradle :example:composeApp:jsBrowserDistribution --no-daemon
+
+      - name: Collect JS Artifacts
+        run: |
+          mkdir -p artifacts/js
+            if [ -d example/composeApp/build/distributions ]; then
+              cp -r example/composeApp/build/distributions/* artifacts/js/
+            fi
+            if [ -d example/composeApp/build/dist/js/productionExecutable ]; then
+              cp -r example/composeApp/build/dist/js/productionExecutable/* artifacts/js/
+            fi
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-js-build
+          path: artifacts/js
+          retention-days: 14
+
+  build-example-wasm:
+    name: Build example app (WASM)
+    needs: build-lib
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      - name: Setup build env
+        uses: ./.github/actions/build-env
+
+      - name: Assemble
+        run: |
+          gradle :example:composeApp:wasmJsBrowserProductionWebpack --no-daemon || \
+          gradle :example:composeApp:wasmJsBrowserDistribution --no-daemon
+
+      - name: Collect Artifacts
+        run: |
+          mkdir -p artifacts/wasm
+          if [ -d example/composeApp/build/distributions ]; then
+            cp -r example/composeApp/build/distributions/* artifacts/wasm/
+          fi
+          if [ -d example/composeApp/build/dist/wasmJs/productionExecutable ]; then
+            cp -r example/composeApp/build/dist/wasmJs/productionExecutable/* artifacts/wasm/
+          fi
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-wasm-build
+          path: artifacts/wasm
+          retention-days: 14
+
   summary:
     name: Build Summary
     runs-on: ubuntu-latest
-    needs: [build-lib, build-example-apk, build-example-jar]
+    needs: [build-lib, build-example-apk, build-example-jar, build-example-js, build-example-wasm]
     steps:
       - name: Summary
         run: echo "Build jobs completed successfully."
