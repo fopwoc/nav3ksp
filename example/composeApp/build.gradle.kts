@@ -80,7 +80,7 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "io.github.fopwoc.nav3ksp.example.MainKt"
+        mainClass = "$group.nav3ksp.example.MainKt"
     }
 }
 
@@ -93,11 +93,11 @@ ksp {
 }
 
 android {
-    namespace = "io.github.fopwoc.nav3ksp.example"
+    namespace = "$group.nav3ksp.example"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "io.github.fopwoc.nav3ksp.example"
+        applicationId = "$group.nav3ksp.example"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
