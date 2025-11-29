@@ -46,12 +46,10 @@ jobs:
         include:
           - target: apk
             gradle_task: ":example:composeApp:assembleRelease"
-          - target: jar
-            gradle_task: ":example:composeApp:jvmJar"
           - target: js
-            gradle_task: ":example:composeApp:jsBrowserProductionWebpack || gradle :example:composeApp:jsBrowserDistribution"
+            gradle_task: ":example:composeApp:jsBrowserDistribution"
           - target: wasm
-            gradle_task: ":example:composeApp:wasmJsBrowserProductionWebpack || gradle :example:composeApp:wasmJsBrowserDistribution"
+            gradle_task: ":example:composeApp:wasmJsBrowserDistribution"
 
     steps:
       - name: Check out code
@@ -76,24 +74,11 @@ jobs:
             apk)
               cp -r $APP_BUILD_PATH/outputs/apk/release/*.apk "artifacts/${{ matrix.target }}/"
               ;;
-            jar)
-              cp -r $APP_BUILD_PATH/libs/*.jar "artifacts/${{ matrix.target }}/"
-              ;;
             js)
-              if [ -d $APP_BUILD_PATH/distributions ]; then
-                cp -r $APP_BUILD_PATH/distributions/* "artifacts/${{ matrix.target }}/"
-              fi
-              if [ -d $APP_BUILD_PATH/dist/js/productionExecutable ]; then
-                cp -r $APP_BUILD_PATH/dist/js/productionExecutable/* "artifacts/${{ matrix.target }}/"
-              fi
+              cp -r $APP_BUILD_PATH/dist/js/productionExecutable/* "artifacts/${{ matrix.target }}/"
               ;;
             wasm)
-              if [ -d $APP_BUILD_PATH/distributions ]; then
-                cp -r $APP_BUILD_PATH/distributions/* "artifacts/${{ matrix.target }}/"
-              fi
-              if [ -d $APP_BUILD_PATH/dist/wasmJs/productionExecutable ]; then
-                cp -r $APP_BUILD_PATH/dist/wasmJs/productionExecutable/* "artifacts/${{ matrix.target }}/"
-              fi
+               cp -r $APP_BUILD_PATH/dist/wasmJs/productionExecutable/* "artifacts/${{ matrix.target }}/"
               ;;
           esac
 
