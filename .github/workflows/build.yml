@@ -4,20 +4,21 @@ on:
   workflow_dispatch:
   push:
     paths-ignore:
-      - '*.md'
+      - '**/*.md'
     branches: [master]
   pull_request:
     paths-ignore:
-      - '*.md'
+      - '**/*.md'
     branches: [master]
 
 concurrency:
+  cancel-in-progress: true
   group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  build:
+  build-lib:
     name: Build ${{ matrix.module }}
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -33,4 +34,59 @@ jobs:
         uses: ./.github/actions/build-env
 
       - name: Build
-        run: gradle ${{ matrix.module }}:build --no-configuration-cache
+        run: gradle ${{ matrix.module }}:build --no-daemon
+
+  build-example-apk:
+    name: Build example app (APK)
+    needs: build-lib
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      - name: Setup build env
+        uses: ./.github/actions/build-env
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Assemble APK
+        run: gradle :example:assembleRelease --no-daemon
+
+      - name: Collect Android Artifacts
+        run: |
+          mkdir -p artifacts/android
+          cp -r example/composeApp/build/outputs/apk/release/*.apk artifacts/android/
+
+      - name: Upload Android Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build
+          path: artifacts/android
+          retention-days: 14
+
+  build-example-jar:
+    name: Build example app (JAR)
+    needs: build-lib
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      - name: Setup build env
+        uses: ./.github/actions/build-env
+
+      - name: Assemble APK
+        run: gradle :example:jvmJar --no-daemon
+
+      - name: Collect Android Artifacts
+        run: |
+          mkdir -p artifacts/jvm
+          cp -r example/composeApp/build/libs/*.apk artifacts/android/
+
+      - name: Upload Android Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: jvm-build
+          path: artifacts/jvm
+          retention-days: 14
