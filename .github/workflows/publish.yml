@@ -23,13 +23,13 @@ jobs:
         uses: ./.github/actions/build-env
 
       - name: Publish
-        run: gradle publishToMavenCentral --no-configuration-cache --no-daemon
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS_B64 }}
+        run: gradle publishToMavenCentral --no-configuration-cache --no-daemon
 
       - name: Determine prerelease
         id: release_meta
@@ -46,5 +46,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          prerelease: ${{ steps.release_type.outputs.prerelease }}
-          draft: ${{ steps.release_type.outputs.draft }}
+          prerelease: ${{ steps.release_meta.outputs.prerelease }}
+          draft: ${{ steps.release_meta.outputs.draft }}
