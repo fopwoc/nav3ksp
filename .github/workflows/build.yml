@@ -51,7 +51,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Assemble
-        run: gradle :example:composeApp:assembleRelease --no-daemon
+        run: gradle :example:composeApp:assembleDebug --no-daemon
 
       - name: Collect Artifacts
         env:
@@ -66,11 +66,3 @@ jobs:
           name: android-build
           path: artifacts/android
           retention-days: 14
-
-  summary:
-    name: Build Summary
-    runs-on: ubuntu-latest
-    needs: [build-lib, build-example-apk]
-    steps:
-      - name: Summary
-        run: echo "Build jobs completed successfully."
