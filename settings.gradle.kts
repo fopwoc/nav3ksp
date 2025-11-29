@@ -1,4 +1,4 @@
-rootProject.name = "nav3ksp"
+rootProject.name = "nav3ksp-lib"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
@@ -35,5 +35,6 @@ include(
     ":example:composeApp"
 )
 
+project(":lib").name = "nav3ksp"
 project(":ksp:annotation").name = "nav3ksp-annotation"
 project(":ksp:processor").name = "nav3ksp-processor"

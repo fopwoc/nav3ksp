@@ -71,7 +71,7 @@ kotlin {
                 implementation(libs.navigationevent)
                 implementation(libs.serialization)
 
-                implementation(projects.lib)
+                implementation(projects.nav3ksp)
                 implementation(projects.ksp.nav3kspAnnotation)
             }
         }

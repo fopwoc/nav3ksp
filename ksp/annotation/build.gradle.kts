@@ -34,6 +34,7 @@ kotlin {
     }
 
     js {
+        outputModuleName = project.name
         browser()
         nodejs()
     }
