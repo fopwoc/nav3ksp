@@ -17,6 +17,18 @@ Somewhat inspired by awesome android library [compose-destinations](https://gith
 
 ---
 
+## Supported Platforms
+
+Nav3ksp is a **Kotlin Multiplatform** library supporting:
+
+- ✅ **Android** (API 24+)
+- ✅ **iOS** (arm64, simulatorArm64)
+- ✅ **JVM** (Desktop)
+- ✅ **JavaScript** (Browser, Node.js)
+- ✅ **WebAssembly (Wasm-JS)** (Browser, Node.js, D8)
+
+---
+
 ## Showcase
 
 Android | iOS

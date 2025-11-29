@@ -1,4 +1,5 @@
 import com.android.build.api.dsl.androidLibrary
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -34,6 +35,19 @@ kotlin {
         }
     }
 
+    js {
+        outputModuleName = project.name
+        browser()
+        nodejs()
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+        nodejs()
+        d8()
+    }
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -50,8 +64,6 @@ kotlin {
             api(libs.compose.foundation)
             api(libs.navigation3)
             api(libs.serialization)
-
-            api(projects.ksp.nav3kspAnnotation)
         }
     }
 }

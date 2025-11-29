@@ -21,8 +21,9 @@ kotlin {
             resources.srcDir("src/main/resources")
 
             dependencies {
-                implementation(projects.lib)
+                implementation(projects.nav3ksp)
                 implementation(projects.ksp.nav3kspAnnotation)
+
                 implementation(libs.navigation3)
                 implementation(libs.compose.lifecycle.viewmodel)
 

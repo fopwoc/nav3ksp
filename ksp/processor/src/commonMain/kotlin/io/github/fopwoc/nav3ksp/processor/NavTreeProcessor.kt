@@ -196,7 +196,7 @@ class NavTreeProcessor(
                         .build()
                 )
                 .build()
-                .writeTo(codeGenerator, true)
+                .writeTo(codeGenerator, false, listOfNotNull(tree.containingFile) + branches.mapNotNull { it.containingFile })
         }
 
         fun generateNavTreeLayout(
@@ -265,7 +265,7 @@ class NavTreeProcessor(
                 )
                 .addAliasedImport(ClassName("kotlinx.serialization.modules", "subclass"), "subclass")
                 .build()
-                .writeTo(codeGenerator, true)
+                .writeTo(codeGenerator, false, listOfNotNull(tree.containingFile) + branches.mapNotNull { it.containingFile } + subTree.mapNotNull { it.declaration.containingFile })
         }
 
         fun generateNavTreeBuilder(
@@ -362,7 +362,7 @@ class NavTreeProcessor(
                     }
                 }
                 .build()
-                .writeTo(codeGenerator, true)
+                .writeTo(codeGenerator, false, listOfNotNull(tree.containingFile) + branches.mapNotNull { it.containingFile } + subTree.mapNotNull { it.declaration.containingFile })
         }
 
         fun KSValueParameter.implementsViewModel(resolver: Resolver): Boolean {
