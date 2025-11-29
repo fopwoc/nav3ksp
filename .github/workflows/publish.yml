@@ -5,6 +5,7 @@ on:
   push:
     tags:
       - "*.*.*"
+      - "*.*.*-*"
 
 jobs:
   publish:
@@ -18,7 +19,7 @@ jobs:
         uses: ./.github/actions/build-env
 
       - name: Publish
-        run: gradle publishToMavenCentral --no-configuration-cache
+        run: gradle publishToMavenCentral --no-configuration-cache --no-daemon
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
@@ -26,8 +27,20 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS }}
 
+      - name: Determine prerelease
+        id: release_meta
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == *-* ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+            echo "draft=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+            echo "draft=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          draft: true
+          prerelease: ${{ steps.release_type.outputs.prerelease }}
+          draft: ${{ steps.release_type.outputs.draft }}
