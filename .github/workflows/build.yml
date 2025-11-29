@@ -58,7 +58,7 @@ jobs:
           APP_BUILD_PATH: "example/composeApp/build"
         run: |
           mkdir -p artifacts/android
-          cp -r $APP_BUILD_PATH/outputs/apk/release/*.apk artifacts/android/
+          cp -r $APP_BUILD_PATH/outputs/apk/debug/*.apk artifacts/android/
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
