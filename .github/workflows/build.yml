@@ -18,7 +18,7 @@ concurrency:
 jobs:
   build-lib:
     name: Build ${{ matrix.module }}
-    runs-on: ubuntu-latest
+    runs-on: macOS-latest
     strategy:
       fail-fast: false
       matrix:
@@ -90,3 +90,11 @@ jobs:
           name: jvm-build
           path: artifacts/jvm
           retention-days: 14
+
+  summary:
+    name: Build Summary
+    runs-on: ubuntu-latest
+    needs: [build-lib, build-example-apk, build-example-jar]
+    steps:
+      - name: Summary
+        run: echo "Build jobs completed successfully."
