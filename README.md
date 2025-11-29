@@ -40,7 +40,7 @@ Firstly, you need to install the latest version of KSP plugin in your project.
 plugins {
     // ...
     // check for the latest version here https://github.com/google/ksp/releases
-    id("com.google.devtools.ksp") version "2.3.2" 
+    id("com.google.devtools.ksp") version "2.3.3" 
 }
 ```
 
