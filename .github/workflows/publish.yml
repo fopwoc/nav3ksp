@@ -7,8 +7,12 @@ on:
       - "*.*.*"
       - "*.*.*-*"
 
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
-  publish:
+  maven_publish:
     name: Publish release
     runs-on: macOS-latest
     steps:
