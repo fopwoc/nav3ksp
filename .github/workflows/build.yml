@@ -34,7 +34,7 @@ jobs:
         uses: ./.github/actions/build-env
 
       - name: Build
-        run: gradle ${{ matrix.module }}:build --no-daemon
+        run: gradle ${{ matrix.module }}:assemble --no-daemon
 
   build-example-apk:
     name: Build example app (APK)
