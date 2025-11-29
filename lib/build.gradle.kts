@@ -63,8 +63,6 @@ kotlin {
             api(libs.compose.foundation)
             api(libs.navigation3)
             api(libs.serialization)
-
-            api(projects.ksp.nav3kspAnnotation)
         }
     }
 }

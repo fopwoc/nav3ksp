@@ -12,6 +12,9 @@ plugins {
 }
 
 kotlin {
+    jvm()
+    jvmToolchain(libs.versions.java.get().toInt())
+
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.fromTarget(libs.versions.java.get()))
@@ -48,6 +51,9 @@ kotlin {
     }
 
     sourceSets {
+        jvmMain.dependencies {
+            implementation(compose.desktop.currentOs)
+        }
         androidMain.dependencies {
             implementation(libs.compose.activity)
         }
@@ -66,8 +72,15 @@ kotlin {
                 implementation(libs.serialization)
 
                 implementation(projects.lib)
+                implementation(projects.ksp.nav3kspAnnotation)
             }
         }
+    }
+}
+
+compose.desktop {
+    application {
+        mainClass = "io.github.fopwoc.nav3ksp.example.MainKt"
     }
 }
 
@@ -88,7 +101,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "1.0"
+        versionName = version.toString()
     }
     packaging {
         resources {
