@@ -1,4 +1,4 @@
-package io.github.fopwoc.nav3ksp.example.io.github.fopwoc.nav3ksp.example
+package io.github.fopwoc.nav3ksp.example
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport

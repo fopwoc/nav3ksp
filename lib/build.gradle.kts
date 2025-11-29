@@ -37,12 +37,15 @@ kotlin {
 
     js {
         outputModuleName = project.name
+        binaries.library()
         browser()
         nodejs()
     }
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
+        outputModuleName = project.name
+        binaries.library()
         browser()
         nodejs()
         d8()
