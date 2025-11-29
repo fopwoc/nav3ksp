@@ -34,20 +34,11 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_KEY_CONTENTS_B64 }}
         run: gradle publishAndReleaseToMavenCentral --no-configuration-cache --no-daemon
 
-      - name: Determine prerelease
-        id: release_meta
-        run: |
-          if [[ "${GITHUB_REF_NAME}" == *-* ]]; then
-            echo "prerelease=true" >> "$GITHUB_OUTPUT"
-            echo "draft=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "prerelease=false" >> "$GITHUB_OUTPUT"
-            echo "draft=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Release
         uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
         with:
+          tag_name: v${{ github.ref_name }}
+          prerelease: ${{ contains(github.ref_name, '-') }}
           generate_release_notes: true
-          prerelease: ${{ steps.release_meta.outputs.prerelease }}
-          draft: ${{ steps.release_meta.outputs.draft }}
+          draft: false
