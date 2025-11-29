@@ -28,7 +28,7 @@ jobs:
           - ":ksp:nav3ksp-processor"
     steps:
       - name: Check out code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup build env
         uses: ./.github/actions/build-env
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup build env
         uses: ./.github/actions/build-env
