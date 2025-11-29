@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         module:
-          - ":lib"
+          - ":nav3ksp"
           - ":ksp:nav3ksp-annotation"
           - ":ksp:nav3ksp-processor"
     steps:
