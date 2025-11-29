@@ -8,6 +8,8 @@ runs:
       with:
         distribution: 'temurin'
         java-version: 21
+        check-latest: true
+        cache: gradle
 
     - name: Set up Gradle
       uses: gradle/actions/setup-gradle@v5
