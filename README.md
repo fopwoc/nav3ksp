@@ -149,3 +149,4 @@ For more examples, you can see the 'example' module with a multiplatform app tha
 5) [Nested](example/composeApp/src/commonMain/kotlin/io/github/fopwoc/nav3ksp/example/05-nested.kt) - Nested navigation with bottom bar and 3 views. Also, an example of handing backstack from another scope.
 6) [Result](example/composeApp/src/commonMain/kotlin/io/github/fopwoc/nav3ksp/example/06-result.kt) - Navigation to form with result handling by another View.
 7) [Manual](example/composeApp/src/commonMain/kotlin/io/github/fopwoc/nav3ksp/example/07-manual.kt) - Non-KSP usage, a-ka 'Boilerplate by hand'.
+8) [Dialog](example/composeApp/src/commonMain/kotlin/io/github/fopwoc/nav3ksp/example/08-dialog.kt) - Dialog popup example via Scene and route metadata
