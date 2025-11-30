@@ -31,8 +31,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.modules.PolymorphicModuleBuilder
 import kotlinx.serialization.modules.subclass
 
-
-
 @Tree
 annotation class ExampleManualTree
 

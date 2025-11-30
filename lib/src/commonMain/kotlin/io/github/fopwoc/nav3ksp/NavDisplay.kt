@@ -6,6 +6,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.scene.SceneStrategy
+import androidx.navigation3.scene.SinglePaneSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 
 /**
@@ -14,15 +16,18 @@ import androidx.navigation3.ui.NavDisplay
  * to navigate in context of this NavDisplay.
  * @property backStackLocalComposition - composition provider that is containing BackStack related to your Tree.
  * By design, this is CompositionLocal to provide 'context-right' backstack getter in every component you need.
+ * @property sceneStrategy - scene strategy provider.
  */
 @Composable
 fun NavDisplay(
     modifier: Modifier = Modifier,
+    sceneStrategy: SceneStrategy<NavKey> = SinglePaneSceneStrategy(),
     navTreeBuilder: NavTreeBuilder,
     backStackLocalComposition: ProvidableCompositionLocal<NavBackStack<NavKey>>,
 ) {
     NavDisplay(
         modifier = modifier,
+        sceneStrategy = sceneStrategy,
         backStack = backStackLocalComposition.current,
         entryProvider = entryProvider {
             with(navTreeBuilder) {

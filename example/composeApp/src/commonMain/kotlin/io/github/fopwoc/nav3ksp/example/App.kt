@@ -12,10 +12,13 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.scene.DialogSceneStrategy
+import androidx.navigation3.scene.SceneStrategy
 import io.github.fopwoc.nav3ksp.NavDisplay
 import io.github.fopwoc.nav3ksp.NavTree
 import io.github.fopwoc.nav3ksp.NavTreeBuilder
@@ -24,6 +27,7 @@ import io.github.fopwoc.nav3ksp.annotation.Branch
 import io.github.fopwoc.nav3ksp.annotation.Tree
 import io.github.fopwoc.nav3ksp.example.exampleArgumentsTree.ExampleArgumentsNavTree
 import io.github.fopwoc.nav3ksp.example.exampleBackHandledTree.ExampleBackHandledNavTree
+import io.github.fopwoc.nav3ksp.example.exampleDialogTree.ExampleDialogNavTree
 import io.github.fopwoc.nav3ksp.example.exampleManualTree.ExampleManualNavTree
 import io.github.fopwoc.nav3ksp.example.exampleNestedTree.ExampleNestedNavTree
 import io.github.fopwoc.nav3ksp.example.exampleResultTree.ExampleResultNavTree
@@ -46,6 +50,7 @@ fun App() {
             LocalBackStack provides RootNavTreeLayout.rememberTreeBackStack(RootNavTree.Entrypoint)
         ) {
             NavDisplay(
+                sceneStrategy = remember { DialogSceneStrategy() },
                 navTreeBuilder = RootNavTreeBuilder,
                 backStackLocalComposition = LocalBackStack
             )
@@ -66,6 +71,7 @@ val LocalBackStack = compositionLocalOf<NavBackStack<NavKey>> {
         ExampleNestedTree::class,
         ExampleResultTree::class,
         ExampleManualTree::class,
+        ExampleDialogTree::class,
     ]
 )
 annotation class RootTree
@@ -153,6 +159,16 @@ fun EntrypointView() {
                     }
                 ) {
                     Text("Manual NavDisplay")
+                }
+            }
+
+            item {
+                Button(
+                    onClick = {
+                        backStack.add(ExampleDialogNavTree.DialogExample)
+                    }
+                ) {
+                    Text("Dialog")
                 }
             }
         }

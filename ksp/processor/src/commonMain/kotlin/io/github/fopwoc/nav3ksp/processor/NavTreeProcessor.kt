@@ -55,7 +55,7 @@ class NavTreeProcessor(
             .filterIsInstance<KSFunctionDeclaration>()
             .toSet()
 
-        val branchTrees = branchesSymbols.filter { it.validate() }.associateWith { branch ->
+        val branchTrees = branchesSymbols.filter { it.validate() }.map { branch ->
             require(branch.annotations.toList().isNotEmpty()) {
                 logger.error("Branch $branch has no any annotation. How???", branch)
             }
@@ -69,42 +69,43 @@ class NavTreeProcessor(
             }
 
             branchAnnotation.map { annotation ->
-                require(annotation.arguments.size == 1) {
-                    logger.error(
-                        "annotation $branchAnnotation of branch $branch have to be with single argument.",
-                        branch
-                    )
-                    logger.error("Actually how did you even end up like this???", branch)
-                }
-
                 val treeType = annotation.arguments.first().value as KSType
 
                 require(
                     treeType.declaration.annotations.map { it.shortName.getShortName() }.toList()
                         .any { it == Tree::class.java.simpleName }
                 ) {
-                    logger.error("Tree \"$treeType\" in branch annotation of $branch have to implement @Tree", branch)
+                    logger.error(
+                        "Tree \"$treeType\" in branch annotation of $branch have to implement @Tree",
+                        branch
+                    )
                 }
 
-                treeType
-            }
-        }
+                val metadataType = if (annotation.arguments.size == 2) {
+                    annotation.arguments[1].value as KSType
+                } else {
+                    null
+                }
 
+                BranchMeta(
+                    annotation = branch,
+                    treeSymbols = treesSymbols.filter { it.validate() }.first {
+                        it.toClassName() == treeType.toClassName()
+                    },
+                    tree = treeType,
+                    metadata = metadataType
+                )
+            }.toList()
+        }.flatten()
 
-        val treesWithBranches = treesSymbols.filter { it.validate() }.associateWith { tree ->
-            branchTrees.filter { (_, annotations) ->
-                tree.toClassName() in annotations.map { it.toClassName() }
-            }.keys.toSet()
-        }
-
-        logger.info("treesWithBranches $treesWithBranches")
+        val treesWithBranches = branchTrees.groupBy { it.treeSymbols }
 
         if (treesWithBranches.isEmpty()) {
             return emptyList()
         }
 
-        treesWithBranches.forEach { (tree, branches) ->
-            require(branches.isNotEmpty()) {
+        treesWithBranches.forEach { (tree, branchesMeta) ->
+            require(branchesMeta.isNotEmpty()) {
                 logger.error("No branches found for tree $tree", tree)
             }
 
@@ -123,11 +124,18 @@ class NavTreeProcessor(
                 logger.error("tree $tree contains some wierd chars", tree)
             }
 
-            logger.info("processing tree $tree (subtree $subTree) with branches $branches")
+            logger.info(
+                "processing tree $tree${if (subTree.isNotEmpty()) {
+                    " (subtree $subTree)"
+                } else {""}
+                } with branches ${branchesMeta.map { it.annotation }}"
+            )
 
-            generateNavTree(resolver, codeGenerator, tree, branches)
-            generateNavTreeLayout(codeGenerator, tree, subTree, branches)
-            generateNavTreeBuilder(resolver, codeGenerator, tree, subTree, branches)
+            val treeToBranchesMeta = tree to branchesMeta
+
+            generateNavTree(resolver, codeGenerator, treeToBranchesMeta)
+            generateNavTreeLayout(codeGenerator, treeToBranchesMeta, subTree)
+            generateNavTreeBuilder(resolver, codeGenerator, treeToBranchesMeta, subTree)
         }
 
         return (treesSymbols + branchesSymbols).filterNot { it.validate() }
@@ -142,12 +150,21 @@ class NavTreeProcessor(
         const val BRANCH_VIEW_SUFFIX = "View"
         const val BRANCH_TREE_SUFFIX = "Tree"
 
+        data class BranchMeta(
+            val annotation: KSFunctionDeclaration,
+            val treeSymbols: KSClassDeclaration,
+            val tree: KSType,
+            val metadata: KSType?
+        )
+
         fun generateNavTree(
             resolver: Resolver,
             codeGenerator: CodeGenerator,
-            tree: KSClassDeclaration,
-            branches: Set<KSFunctionDeclaration>
+            treeToBranchesMeta: Pair<KSClassDeclaration, List<BranchMeta>>
         ) {
+            val (tree, branchesMeta) = treeToBranchesMeta
+            val branches = branchesMeta.map { it.annotation }
+
             val className = tree.asStarProjectedType().toTreeClassName(OBJECT_TREE_POSTFIX)
 
             val typedBranchesBuilder = branches.map { branch ->
@@ -196,15 +213,21 @@ class NavTreeProcessor(
                         .build()
                 )
                 .build()
-                .writeTo(codeGenerator, false, listOfNotNull(tree.containingFile) + branches.mapNotNull { it.containingFile })
+                .writeTo(
+                    codeGenerator = codeGenerator,
+                    aggregating = false,
+                    originatingKSFiles = listOfNotNull(tree.containingFile) + branches.mapNotNull { it.containingFile }
+                )
         }
 
         fun generateNavTreeLayout(
             codeGenerator: CodeGenerator,
-            tree: KSClassDeclaration,
+            treeToBranchesMeta: Pair<KSClassDeclaration, List<BranchMeta>>,
             subTree: Set<KSType>,
-            branches: Set<KSFunctionDeclaration>
         ) {
+            val (tree, branchesMeta) = treeToBranchesMeta
+            val branches = branchesMeta.map { it.annotation }
+
             val className = tree.asStarProjectedType().toTreeClassName(OBJECT_TREE_LAYOUT_POSTFIX)
 
             val branchesPolymorphicSubclasses = branches.map { branch ->
@@ -265,24 +288,32 @@ class NavTreeProcessor(
                 )
                 .addAliasedImport(ClassName("kotlinx.serialization.modules", "subclass"), "subclass")
                 .build()
-                .writeTo(codeGenerator, false, listOfNotNull(tree.containingFile) + branches.mapNotNull { it.containingFile } + subTree.mapNotNull { it.declaration.containingFile })
+                .writeTo(
+                    codeGenerator = codeGenerator,
+                    aggregating = false,
+                    originatingKSFiles = listOfNotNull(tree.containingFile) + branches.mapNotNull {
+                        it.containingFile
+                    } + subTree.mapNotNull { it.declaration.containingFile }
+                )
         }
 
         fun generateNavTreeBuilder(
             resolver: Resolver,
             codeGenerator: CodeGenerator,
-            tree: KSClassDeclaration,
+            treeToBranchesMeta: Pair<KSClassDeclaration, List<BranchMeta>>,
             subTree: Set<KSType>,
-            branches: Set<KSFunctionDeclaration>
         ) {
+            val (tree, branchesMeta) = treeToBranchesMeta
+            val branches = branchesMeta.map { it.annotation }
+
             val className = tree.asStarProjectedType().toTreeClassName(OBJECT_TREE_BUILDER_POSTFIX)
             val classNameTree = tree.asStarProjectedType().toTreeClassName(OBJECT_TREE_POSTFIX)
 
-            val branchesEntry = branches.map { branch ->
-                val branchName = branch.simpleName.getShortName().removeSuffix(BRANCH_VIEW_SUFFIX)
-                val viewName = branch.simpleName.getShortName()
+            val branchesEntry = branchesMeta.map { branchMeta ->
+                val branchName = branchMeta.annotation.simpleName.getShortName().removeSuffix(BRANCH_VIEW_SUFFIX)
+                val viewName = branchMeta.annotation.simpleName.getShortName()
 
-                val params = branch.parameters
+                val params = branchMeta.annotation.parameters
                     .filterNot { it.implementsViewModel(resolver) }
                     .map { param ->
                         val p = param.name!!.getShortName()
@@ -290,20 +321,43 @@ class NavTreeProcessor(
                     }
                     .joinToCode(separator = ", ")
 
-                CodeBlock.builder()
-                    .add("entry<%T> {\n", classNameTree.nestedClass(branchName))
-                    .indent()
-                    .addStatement(
-                        format = "%M(%L)",
-                        MemberName(
-                            branch.packageName.asString(),
-                            viewName
-                        ),
-                        params
-                    )
-                    .unindent()
-                    .add("}\n")
-                    .build()
+                if(branchMeta.metadata != null) {
+                    val metadataName = branchMeta.metadata
+
+
+                    CodeBlock.builder()
+                        .add("entry<%T>(metadata = $metadataName.metadata()) {\n", classNameTree.nestedClass(branchName))
+                        .indent()
+                        .addStatement(
+                            format = "%M(%L)",
+                            MemberName(
+                                branchMeta.annotation.packageName.asString(),
+                                viewName
+                            ),
+                            params
+                        )
+                        .unindent()
+                        .add("}\n")
+                        .build()
+
+                } else {
+                    CodeBlock.builder()
+                        .add("entry<%T> {\n", classNameTree.nestedClass(branchName))
+                        .indent()
+                        .addStatement(
+                            format = "%M(%L)",
+                            MemberName(
+                                branchMeta.annotation.packageName.asString(),
+                                viewName
+                            ),
+                            params
+                        )
+                        .unindent()
+                        .add("}\n")
+                        .build()
+
+                }
+
             }
 
             val function = FunSpec
@@ -352,17 +406,27 @@ class NavTreeProcessor(
                         .build()
                 )
                 .also { builder ->
-                    branches.forEach { branch ->
+                    branchesMeta.forEach { branchMeta ->
                         val branchClassName = ClassName(
-                            branch.qualifiedName!!.getQualifier(),
-                            branch.simpleName.getShortName()
+                            branchMeta.annotation.qualifiedName!!.getQualifier(),
+                            branchMeta.annotation.simpleName.getShortName()
                         )
 
-                        builder.addAliasedImport(branchClassName, branch.simpleName.getShortName())
+                        builder.addAliasedImport(branchClassName, branchMeta.annotation.simpleName.getShortName())
+
+                        if (branchMeta.metadata != null) {
+                            builder.addAliasedImport(branchMeta.metadata.toClassName(), branchMeta.metadata.toString())
+                        }
                     }
                 }
                 .build()
-                .writeTo(codeGenerator, false, listOfNotNull(tree.containingFile) + branches.mapNotNull { it.containingFile } + subTree.mapNotNull { it.declaration.containingFile })
+                .writeTo(
+                    codeGenerator = codeGenerator,
+                    aggregating = false,
+                    originatingKSFiles = listOfNotNull(tree.containingFile) + branches.mapNotNull {
+                        it.containingFile
+                    } + subTree.mapNotNull { it.declaration.containingFile }
+                )
         }
 
         fun KSValueParameter.implementsViewModel(resolver: Resolver): Boolean {
