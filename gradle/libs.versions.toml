@@ -12,7 +12,7 @@ material3 = "1.10.0-alpha05"
 navigation3 = "1.0.0-alpha06"
 navigationevent = "1.0.0-rc02"
 serialization = "1.9.0"
-ksp = "2.3.3"
+ksp = "2.3.4"
 kotlinpoet = "2.2.0"
 maven = "0.35.0"
 
