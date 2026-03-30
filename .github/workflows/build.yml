@@ -48,7 +48,7 @@ jobs:
         uses: ./.github/actions/build-env
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Assemble
         run: gradle :example:composeApp:assembleDebug --no-daemon
