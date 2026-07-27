@@ -32,7 +32,8 @@ include(
     ":lib",
     ":ksp:annotation",
     ":ksp:processor",
-    ":example:composeApp"
+    ":example:composeApp",
+    ":example:androidApp"
 )
 
 project(":lib").name = "nav3ksp"
