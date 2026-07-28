@@ -1,9 +1,9 @@
 import com.google.devtools.ksp.gradle.KspAATask
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 
 plugins {
-    alias(libs.plugins.androidApplication)
+    //alias(libs.plugins.androidApplication)
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.compose)
     alias(libs.plugins.composeCompiler)
@@ -15,11 +15,21 @@ kotlin {
     jvm()
     jvmToolchain(libs.versions.java.get().toInt())
 
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.fromTarget(libs.versions.java.get()))
-        }
-    }
+    //androidTarget()
+
+//    android {
+//        namespace = "$group.nav3ksp.example"
+//        compileSdk = libs.versions.android.compileSdk.get().toInt()
+//        minSdk = libs.versions.android.minSdk.get().toInt()
+//
+//        withJava()
+//
+//        compilerOptions {
+//            jvmTarget.set(JvmTarget.fromTarget(libs.versions.java.get()))
+//        }
+//    }
+
+
 
     js {
         browser {
@@ -54,9 +64,6 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
         }
-        androidMain.dependencies {
-            implementation(libs.compose.activity)
-        }
         commonMain {
             kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
             dependencies {
@@ -90,36 +97,6 @@ dependencies {
 
 ksp {
     arg("logLevel", "info")
-}
-
-android {
-    namespace = "$group.nav3ksp.example"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-
-    defaultConfig {
-        applicationId = "$group.nav3ksp.example"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = version.toString()
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.toVersion(libs.versions.java.get())
-        targetCompatibility = JavaVersion.toVersion(libs.versions.java.get())
-    }
-    buildFeatures {
-        compose = true
-    }
 }
 
 tasks.withType<KspAATask>().configureEach {

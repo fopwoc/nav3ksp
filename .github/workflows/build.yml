@@ -51,11 +51,11 @@ jobs:
         uses: android-actions/setup-android@v4
 
       - name: Assemble
-        run: gradle :example:composeApp:assembleDebug --no-daemon
+        run: gradle :example:androidApp:assembleDebug --no-daemon
 
       - name: Collect Artifacts
         env:
-          APP_BUILD_PATH: "example/composeApp/build"
+          APP_BUILD_PATH: "example/androidApp/build"
         run: |
           mkdir -p artifacts/android
           cp -r $APP_BUILD_PATH/outputs/apk/debug/*.apk artifacts/android/

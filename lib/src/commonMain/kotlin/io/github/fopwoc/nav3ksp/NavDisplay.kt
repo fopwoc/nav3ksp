@@ -8,7 +8,6 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.scene.SinglePaneSceneStrategy
-import androidx.navigation3.ui.NavDisplay
 
 /**
  * [NavDisplay] proxy function that does bare minimum to show something useful.
@@ -21,13 +20,13 @@ import androidx.navigation3.ui.NavDisplay
 @Composable
 fun NavDisplay(
     modifier: Modifier = Modifier,
-    sceneStrategy: SceneStrategy<NavKey> = SinglePaneSceneStrategy(),
+    sceneStrategies: List<SceneStrategy<NavKey>> = listOf(SinglePaneSceneStrategy()),
     navTreeBuilder: NavTreeBuilder,
     backStackLocalComposition: ProvidableCompositionLocal<NavBackStack<NavKey>>,
 ) {
-    NavDisplay(
+    androidx.navigation3.ui.NavDisplay(
         modifier = modifier,
-        sceneStrategy = sceneStrategy,
+        sceneStrategies = sceneStrategies,
         backStack = backStackLocalComposition.current,
         entryProvider = entryProvider {
             with(navTreeBuilder) {
