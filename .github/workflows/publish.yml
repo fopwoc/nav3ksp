@@ -35,7 +35,7 @@ jobs:
         run: gradle publishAndReleaseToMavenCentral --no-configuration-cache --no-daemon
 
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         if: github.ref_type == 'tag'
         with:
           tag_name: v${{ github.ref_name }}
