@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -63,7 +62,6 @@ class FirstViewModel : ViewModel() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Branch(NestedFirst::class)
 @Composable
 fun FirstView(
@@ -109,7 +107,6 @@ class SecondViewModel : ViewModel() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Branch(NestedSecond::class)
 @Composable
 fun SecondView(
@@ -149,7 +146,6 @@ fun SecondView(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Branch(NestedSecond::class)
 @Composable
 fun SecondItemView(
@@ -186,7 +182,6 @@ fun SecondItemView(
 @Tree
 annotation class NestedThird
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Branch(NestedThird::class)
 @Composable
 fun ThirdView() {
@@ -251,7 +246,6 @@ enum class Items(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Branch(ExampleNestedTree::class)
 @Composable
 fun NestedView() {

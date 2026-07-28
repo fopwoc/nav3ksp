@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -21,17 +20,15 @@ kotlin {
     jvm()
     jvmToolchain(libs.versions.java.get().toInt())
 
-    androidLibrary {
+    android {
         namespace = "$group.nav3ksp"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
         withJava()
 
-        compilations.configureEach {
-            compilerOptions.configure {
-                jvmTarget.set(JvmTarget.fromTarget(libs.versions.java.get()))
-            }
+        compilerOptions {
+            jvmTarget.set(JvmTarget.fromTarget(libs.versions.java.get()))
         }
     }
 

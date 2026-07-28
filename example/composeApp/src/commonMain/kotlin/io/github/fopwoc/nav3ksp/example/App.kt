@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -14,15 +13,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
-import androidx.navigation3.scene.SceneStrategy
 import io.github.fopwoc.nav3ksp.NavDisplay
-import io.github.fopwoc.nav3ksp.NavTree
-import io.github.fopwoc.nav3ksp.NavTreeBuilder
-import io.github.fopwoc.nav3ksp.NavTreeLayout
 import io.github.fopwoc.nav3ksp.annotation.Branch
 import io.github.fopwoc.nav3ksp.annotation.Tree
 import io.github.fopwoc.nav3ksp.example.exampleArgumentsTree.ExampleArgumentsNavTree
@@ -33,15 +27,9 @@ import io.github.fopwoc.nav3ksp.example.exampleNestedTree.ExampleNestedNavTree
 import io.github.fopwoc.nav3ksp.example.exampleResultTree.ExampleResultNavTree
 import io.github.fopwoc.nav3ksp.example.exampleSimpleTree.ExampleSimpleNavTree
 import io.github.fopwoc.nav3ksp.example.exampleViewModelTree.ExampleViewModelNavTree
-import io.github.fopwoc.nav3ksp.example.nestedFirst.NestedFirstNavTreeLayout
-import io.github.fopwoc.nav3ksp.example.nestedSecond.NestedSecondNavTreeLayout
-import io.github.fopwoc.nav3ksp.example.nestedThird.NestedThirdNavTreeLayout
 import io.github.fopwoc.nav3ksp.example.rootTree.RootNavTree
 import io.github.fopwoc.nav3ksp.example.rootTree.RootNavTreeBuilder
 import io.github.fopwoc.nav3ksp.example.rootTree.RootNavTreeLayout
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.modules.PolymorphicModuleBuilder
-import kotlinx.serialization.modules.subclass
 
 @Composable
 fun App() {
@@ -50,7 +38,7 @@ fun App() {
             LocalBackStack provides RootNavTreeLayout.rememberTreeBackStack(RootNavTree.Entrypoint)
         ) {
             NavDisplay(
-                sceneStrategy = remember { DialogSceneStrategy() },
+                //sceneStrategy = remember { DialogSceneStrategy() },
                 navTreeBuilder = RootNavTreeBuilder,
                 backStackLocalComposition = LocalBackStack
             )
@@ -76,7 +64,6 @@ val LocalBackStack = compositionLocalOf<NavBackStack<NavKey>> {
 )
 annotation class RootTree
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Branch(RootTree::class)
 @Composable
 fun EntrypointView() {
