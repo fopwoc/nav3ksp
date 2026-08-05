@@ -20,7 +20,7 @@ jobs:
     runs-on: macOS-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup build env
         uses: ./.github/actions/build-env
