@@ -13,7 +13,7 @@ navigation3 = "1.1.1"
 navigationevent = "1.1.0"
 serialization = "1.11.0"
 ksp = "2.3.11"
-kotlinpoet = "2.3.0"
+kotlinpoet = "2.4.0"
 maven = "0.37.0"
 
 [libraries]
